@@ -1,0 +1,54 @@
+// Code from: https://github.com/Dev-Doggo/erc20-huff/blob/master/src/erc20.huff
+
+/* Interface */
+#define function name() view returns(string)
+#define function symbol() view returns(string)
+
+/* Storage Slots */
+#define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
+
+// Constants
+
+// cast --from-utf8 "sbt"
+// cast --to-bytes32 "0x736274"
+#define constant NAME = 0x7362740000000000000000000000000000000000000000000000000000000000
+#define constant NAME_LEN = 0x03
+
+// cast --from-utf8 "SBT"
+// cast --to-bytes32 "0x736274"
+#define constant SYMBOL = 0x5342540000000000000000000000000000000000000000000000000000000000
+#define constant SYMBOL_LEN = 0x03
+
+#define macro NAME_WRAPPER() = takes(0) returns(0) {
+    // main code
+    0x20 0x00 mstore
+    [NAME_LEN] 0x20 mstore
+    [NAME] 0x40 mstore
+
+    0x60 0x00 return
+    exit:
+        0x00 0x00 revert
+}
+
+#define macro SYMBOL_WRAPPER() = takes(0) returns(0) {
+    // main code
+    0x20 0x00 mstore
+    [SYMBOL_LEN] 0x20 mstore
+    [SYMBOL] 0x40 mstore
+
+    0x60 0x00 return
+    exit:
+        0x00 0x00 revert
+}
+
+#define macro MAIN() = takes (0) returns (0) {
+    0x00 calldataload 0xE0 shr // [function_selector]
+    dup1 __FUNC_SIG(name) eq name jumpi
+    dup1 __FUNC_SIG(symbol) eq symbol jumpi
+
+    name:
+        NAME_WRAPPER()
+    symbol:
+        SYMBOL_WRAPPER()
+
+}
